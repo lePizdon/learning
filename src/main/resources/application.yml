@@ -1,0 +1,8 @@
+server:
+  port: 8081
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/drugdatabase
+    username: postgres
+    password: 1234
+debug: true
