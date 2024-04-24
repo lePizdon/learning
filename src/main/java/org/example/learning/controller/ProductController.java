@@ -3,9 +3,9 @@ package org.example.learning.controller;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.learning.client.ProductsRestClient;
 import org.example.learning.controller.payload.UpdateProductPayload;
 import org.example.learning.entity.Product;
-import org.example.learning.service.ProductService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -22,13 +22,13 @@ import java.util.NoSuchElementException;
 @RequestMapping("catalogue/products/{productId:\\d+}")
 public class ProductController {
 
-    private final ProductService productService;
+    private final ProductsRestClient productsRestClient;
 
     private final MessageSource messageSource;
 
     @ModelAttribute("product")
     public Product product(@PathVariable("productId") Integer productId) {
-        return this.productService.findProduct(productId).orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
+        return this.productsRestClient.findProduct(productId).orElseThrow(() -> new NoSuchElementException("catalogue.errors.product.not_found"));
     }
 
     @GetMapping
@@ -53,14 +53,14 @@ public class ProductController {
                     .toList());
             return "catalogue/products/edit";
         } else {
-            this.productService.updateProduct(product.getId(), payload.title(), payload.details());
-            return "redirect:/catalogue/products/%d".formatted(product.getId());
+            this.productsRestClient.updateProduct(product.productId(), payload.title(), payload.details());
+            return "redirect:/catalogue/products/%d".formatted(product.productId());
         }
     }
 
     @PostMapping("delete")
     public String deleteProduct(@ModelAttribute("product") Product product) {
-        this.productService.deleteProduct(product.getId());
+        this.productsRestClient.deleteProduct(product.productId());
         return "redirect:/catalogue/products/list";
     }
 
